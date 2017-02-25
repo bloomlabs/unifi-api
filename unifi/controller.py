@@ -30,10 +30,19 @@ import json
 import logging
 from time import time
 import urllib
-
+from collections import OrderedDict
 
 log = logging.getLogger(__name__)
 
+
+import urllib2
+class RequestWithMethod(urllib2.Request):
+    def __init__(self, *args, **kwargs):
+        self._method = kwargs.pop('method', None)
+        urllib2.Request.__init__(self, *args, **kwargs)
+
+    def get_method(self):
+        return self._method if self._method else super(RequestWithMethod, self).get_method()
 
 class APIError(Exception):
     pass
@@ -369,3 +378,18 @@ class Controller:
         js = {'mac': guest_mac}
 
         return self._run_command(cmd, params=js)
+        
+    def add_radius_user(self, username, password):
+        req= RequestWithMethod(
+                    self.api_url + 'rest/account',
+                    json.dumps({'name': username, 'x_password': password}),
+                    {'Content-Type': 'application/json'}, 
+                    method='POST'
+                    )
+        return self._jsondec(self.opener.open(req).read())
+
+    def get_radius_users(self):
+        return self._read(self.api_url + 'rest/account')
+
+    def delete_radius_user(self, id):
+        return self._jsondec(self.opener.open(RequestWithMethod(self.api_url + 'rest/account/' + id, method='DELETE')).read())
