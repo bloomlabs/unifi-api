@@ -393,3 +393,10 @@ class Controller:
 
     def delete_radius_user(self, id):
         return self._jsondec(self.opener.open(RequestWithMethod(self.api_url + 'rest/account/' + id, method='DELETE')).read())
+
+    def put_wlanconf(self, network_id, settings):
+        settings['_id'] = network_id
+        return self._jsondec(self.opener.open(RequestWithMethod(self.api_url + 'rest/wlanconf/' + network_id, json.dumps(settings), {'Content-Type': 'application/json'}, method='PUT')).read())     
+
+    def set_wifi_password(self, network_id, password):
+        return self.put_wlanconf(network_id, {'x_passphrase': password})
