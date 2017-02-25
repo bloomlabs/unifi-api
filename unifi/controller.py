@@ -382,7 +382,7 @@ class Controller:
     def add_radius_user(self, username, password):
         req= RequestWithMethod(
                     self.api_url + 'rest/account',
-                    json.dumps({'name': username, 'x_password': password}),
+                    json.dumps({'name': username, 'x_password': password.replace('\'', '')}),
                     {'Content-Type': 'application/json'}, 
                     method='POST'
                     )
@@ -393,6 +393,9 @@ class Controller:
 
     def delete_radius_user(self, id):
         return self._jsondec(self.opener.open(RequestWithMethod(self.api_url + 'rest/account/' + id, method='DELETE')).read())
+
+    def put_radius_user(self, id, name, password):
+        return self._jsondec(self.opener.open(RequestWithMethod(self.api_url + 'rest/account/' + id, json.dumps({'name': name, '_id': id, 'x_password': password}), {'Content-Type': 'application/json'}, method='PUT')).read())
 
     def put_wlanconf(self, network_id, settings):
         settings['_id'] = network_id
