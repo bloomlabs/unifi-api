@@ -28,6 +28,7 @@ elif PYTHON_VERSION == 3:
 
 import json
 import logging
+import re
 from time import time
 import urllib
 from collections import OrderedDict
@@ -380,9 +381,10 @@ class Controller:
         return self._run_command(cmd, params=js)
         
     def add_radius_user(self, username, password):
-        req= RequestWithMethod(
+        password = re.sub(r'\s+', '', password.replace('\'', ''))
+        req = RequestWithMethod(
                     self.api_url + 'rest/account',
-                    json.dumps({'name': username, 'x_password': password.replace('\'', '')}),
+                    json.dumps({'name': username, 'x_password': password}),
                     {'Content-Type': 'application/json'}, 
                     method='POST'
                     )
